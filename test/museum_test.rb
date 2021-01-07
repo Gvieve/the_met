@@ -41,4 +41,48 @@ class MuseumTest < Minitest::Test
     expected_2 = [@imax]
     assert_equal expected_2, @dmns.recommend_exhibits(@patron_2)
   end
+
+  def test_it_can_admit_patrons
+    patron_3 = Patron.new("Johnny", 5)
+    patron_3.add_interest("Dead Sea Scrolls")
+    @dmns.add_exhibit(@gems_and_minerals)
+    @dmns.add_exhibit(@dead_sea_scrolls)
+    @dmns.add_exhibit(@imax)
+    @dmns.admit(@patron_1)
+    @dmns.admit(@patron_2)
+    @dmns.admit(patron_3)
+
+    assert_equal [@patron_1, @patron_2, patron_3], @dmns.patrons
+  end
+
+  def test_it_can_have_patrons_by_exhibit_interests
+    patron_3 = Patron.new("Johnny", 5)
+    patron_3.add_interest("Dead Sea Scrolls")
+    @dmns.add_exhibit(@gems_and_minerals)
+    @dmns.add_exhibit(@dead_sea_scrolls)
+    @dmns.add_exhibit(@imax)
+    @dmns.admit(@patron_1)
+    @dmns.admit(@patron_2)
+    @dmns.admit(patron_3)
+    expected_1 = {
+                  @gems_and_minerals => [@patron_1],
+                  @dead_sea_scrolls => [@patron_1, patron_3],
+                  @imax => [@patron_2]
+                 }
+
+    assert_equal expected_1, @dmns.patrons_by_exhibit_interest
+  end
+
+  def test_it_can_give_lottery_tickets
+    patron_3 = Patron.new("Johnny", 5)
+    patron_3.add_interest("Dead Sea Scrolls")
+    @dmns.add_exhibit(@gems_and_minerals)
+    @dmns.add_exhibit(@dead_sea_scrolls)
+    @dmns.add_exhibit(@imax)
+    @dmns.admit(@patron_1)
+    @dmns.admit(@patron_2)
+    @dmns.admit(patron_3)
+
+    assert_equal [@patron_1, patron_3], @dmns.ticket_lottery_contestants(@dead_sea_scrolls)
+  end
 end
